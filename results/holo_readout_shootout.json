@@ -6,7 +6,7 @@
     "train_len": 64,
     "d_model": 128,
     "d_head": 32,
-    "out": "./results/holo_readout_shootout.json"
+    "out": "results/holo_readout_shootout.json"
   },
   "chance": 0.015625,
   "summary": {

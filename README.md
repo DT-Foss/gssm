@@ -103,18 +103,30 @@ GSSM numbers are valid, not a broken harness).
 **Honest framing.** This is a *broken wall, not a solved task.* 8.9% is far below attention's
 ~100%, and we say so. The mechanism that breaks the wall is **key-conditioning of the write**
 (the second-order, outer-product interaction) — not magnitude vs phase, not the number line.
-The plateau and its causes are documented, not hidden:
+The plateau and its causes are documented, not hidden. Every "add more resources" lever was
+measured and came back flat-or-negative — the signature of an *interference* limit, not a
+capacity limit:
 
-- **Channel-count / `d_head` is flat:** sweeping `d_head` 32→96 does not lift recall
-  (`results/holographic_capacity_log.txt`) — capacity is binding-rank-limited, not width-limited.
-- **Separate Q/K is flat:** separate query/key projections do *not* beat the shared key
-  (sep-QK 3.5% vs shared 7.2%, Δ within band) (`results/holographic_qk.json`).
-- **Readout matters and is reported:** `tanh_m` readout carries the effect (7.2%); LayerNorm/RMS
-  readouts collapse it back toward the floor (`results/holo_readout_shootout.json`).
+- **Channel count (`d_head` 32→96): flat** — more complex channels do not lift recall
+  (`results/holographic_capacity_log.txt`). Not width-limited.
+- **More heads (4→8): −4.2 pp** and **more layers (2→3): −4.9 pp** — both *reduce* recall;
+  the depth-2 / 4-head config is the grid optimum (`results/holographic_depth_partial.json`).
+  Spreading the holographic signal across heads/layers dilutes it.
+- **Separate Q/K: −3.65 pp** — separating the write and read key angles *hurts*, because a
+  shared key guarantees `cos(φ_k−φ_q)=1` for the matched pair *by construction*; splitting
+  them breaks that self-consistency (`results/holographic_qk.json`).
+- **Readout is subtle and reported:** the `m·tanh` readout is load-bearing (`m` is the learned
+  *when-to-read* relevance gate); the `rms` readout is the most stable and gives the headline
+  8.9% (`results/holo_readout_shootout.json`).
 
 The standing reading: recall here is **crosstalk-limited** — a single complex track superposes
-all pairs, and many simultaneous keys interfere. The contribution is that the wall is *movable
-at all* by key-conditioning, with the limit measured and its causes named.
+*all* pairs, so the matched key competes with an `O(√N)` interference sum from the others
+(the classic HRR/VSA `~1/√N` holographic-memory law). The decisive test — recall vs. number of
+pairs against the `1/√N` curve — is `src/crosstalk_smoking_gun.py`; the next lever is a
+multi-slot write that superposes fewer pairs per accumulator (`src/holographic_multislot_run.py`).
+The contribution stands regardless of how high the climb goes: a bounded `O(1)`-per-step state
+does content-addressable associative recall *at all*, which the scalar-state wall said was
+impossible — and the limit and its causes are *measured*, not asserted.
 
 ---
 
