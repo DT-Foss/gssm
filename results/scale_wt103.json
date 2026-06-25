@@ -1,0 +1,40 @@
+{
+  "d_model": 128,
+  "train_T": 32,
+  "seed": 42,
+  "corpus": "wt103",
+  "corpus_tokens": 4000000,
+  "curve": {
+    "32": {
+      "ppl": 162.5,
+      "ratio": 1.0,
+      "extrap": 1
+    },
+    "1024": {
+      "ppl": 158.7,
+      "ratio": 0.98,
+      "extrap": 32
+    },
+    "8192": {
+      "ppl": 159.3,
+      "ratio": 0.98,
+      "extrap": 256
+    },
+    "65536": {
+      "ppl": 159.0,
+      "ratio": 0.98,
+      "extrap": 2048
+    },
+    "131072": {
+      "ppl": 158.9,
+      "ratio": 0.98,
+      "extrap": 4096
+    }
+  },
+  "wall": {
+    "T": 262144,
+    "reason": "watchdog SIGKILL at rss=11.10GB > 10GB hard cap (predicted alloc for T=262144 exceeded RAM headroom on 16GB)",
+    "last_flat_T": 131072,
+    "last_flat_extrap": 4096
+  }
+}

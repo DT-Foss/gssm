@@ -104,6 +104,10 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     # extreme length ladder — doubling until OOM
     ap.add_argument("--eval-ts", default="32,256,1024,8192,16384,32768,65536,131072,262144")
+    ap.add_argument("--corpus", default="wt2", choices=["wt2", "wt103"],
+                    help="wt2 (177k val tokens) or wt103 (~100M, for million-token lengths)")
+    ap.add_argument("--wt103-max-tokens", type=int, default=4_000_000,
+                    help="how many WT-103 tokens to load for the long eval (caps RAM of the corpus itself)")
     ap.add_argument("--out", default="results/scale_to_the_wall.json")
     args = ap.parse_args()
 
@@ -118,12 +122,32 @@ def main():
     print("  recurrent (sequential) forward = the O(1) deployment path")
     print("=" * 74)
 
-    # data + train at T=32 (once)
+    # data + train at T=32 (once). Train ALWAYS on WT-2 (same model, same vocab);
+    # only the long EVAL corpus changes for the wt103 escalation.
     train_text, val_text = load_wikitext2()
     vocab, stoi, unk, mask = build_vocab(train_text)
     vsz = len(vocab)
     train_ids = tokenize(train_text, stoi, unk)
-    val_ids = tokenize(val_text, stoi, unk)
+    if args.corpus == "wt103":
+        # stream WT-103 train, tokenize with the SAME WT-2 vocab (comparable PPL),
+        # cap at --wt103-max-tokens so the corpus tensor itself stays RAM-bounded.
+        print(f"  loading WT-103 eval corpus up to {args.wt103_max_tokens:,} tokens "
+              f"(same WT-2 vocab)...")
+        from datasets import load_dataset
+        ds = load_dataset("Salesforce/wikitext", "wikitext-103-raw-v1", split="train")
+        chunks, n = [], 0
+        for row in ds:
+            t = row["text"]
+            if t.strip():
+                ids = tokenize(t, stoi, unk)
+                chunks.extend(ids); n += len(ids)
+                if n >= args.wt103_max_tokens:
+                    break
+        val_ids = chunks[:args.wt103_max_tokens]
+        print(f"  WT-103 eval corpus: {len(val_ids):,} tokens "
+              f"→ supports lengths up to T={len(val_ids):,}")
+    else:
+        val_ids = tokenize(val_text, stoi, unk)
     Xtr, Ytr, Mtr = make_mlm_batches(train_ids, TRAIN_T, 32, mask, MASK_PROB)
     val32 = None
     import length_extrap_v2 as LX
@@ -143,13 +167,23 @@ def main():
                "curve": {}, "oom_at": None}
     for T in eval_ts:
         b = 1 if T >= 16384 else (8 if T >= 512 else 32)
-        # GRACEFUL-ABORT guard: if we're already near the soft budget, stop BEFORE
-        # allocating the next (bigger) tensor — log it as the wall, don't risk the OS.
+        # GRACEFUL-ABORT guard 1: already near the soft budget → stop before next alloc.
         cur = _rss_gb()
         if cur > MEM_SOFT_GB:
             results["oom_at"] = {"T": T, "error": f"soft memory budget {MEM_SOFT_GB}GB "
                                  f"reached (rss={cur:.1f}GB) — graceful stop", "extrap": T // TRAIN_T}
             print(f"  T={T:>7}: ⛔ graceful stop — rss {cur:.1f}GB ≥ soft budget {MEM_SOFT_GB}GB")
+            break
+        # GRACEFUL-ABORT guard 2: PREDICT the next step's memory. The recurrent forward
+        # over (b, T) with d_model carries activations ~ b·T·d·(few buffers). Estimate
+        # conservatively (×16 fudge for intermediate tensors) and stop if cur+est > soft.
+        est_gb = b * T * args.d_model * 16 * 4 / 1e9
+        if cur + est_gb > MEM_SOFT_GB:
+            results["oom_at"] = {"T": T, "extrap": T // TRAIN_T,
+                                 "error": f"predicted alloc {est_gb:.1f}GB + current {cur:.1f}GB "
+                                 f"> soft budget {MEM_SOFT_GB}GB — graceful stop before allocating"}
+            print(f"  T={T:>7}: ⛔ graceful stop — predicted {est_gb:.1f}GB + {cur:.1f}GB "
+                  f"> soft {MEM_SOFT_GB}GB (won't allocate)")
             break
         try:
             t0 = time.time()
