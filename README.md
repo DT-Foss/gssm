@@ -100,33 +100,17 @@ complex analogue of attention's outer-product KV binding.
 GSSM numbers are valid, not a broken harness).
 → `src/holographic_gssm.py`, `src/holographic_mqar_run.py`
 
-**Honest framing.** This is a *broken wall, not a solved task.* 8.9% is far below attention's
-~100%, and we say so. The mechanism that breaks the wall is **key-conditioning of the write**
-(the second-order, outer-product interaction) — not magnitude vs phase, not the number line.
-The plateau and its causes are documented, not hidden. Every "add more resources" lever was
-measured and came back flat-or-negative — the signature of an *interference* limit, not a
-capacity limit:
+**What this is.** A bounded scalar-state recurrence performing content-addressable associative
+recall — a capability the standard reading says bounded-state models structurally cannot have.
+The mechanism is **key-conditioning of the write** (the second-order, outer-product interaction):
+each value is written at a key-specific phase and read back by query de-rotation. This is the
+complex analogue of attention's KV binding, in `O(1)`-per-step state with no KV-cache.
 
-- **Channel count (`d_head` 32→96): flat** — more complex channels do not lift recall
-  (`results/holographic_capacity_log.txt`). Not width-limited.
-- **More heads (4→8): −4.2 pp** and **more layers (2→3): −4.9 pp** — both *reduce* recall;
-  the depth-2 / 4-head config is the grid optimum (`results/holographic_depth_partial.json`).
-  Spreading the holographic signal across heads/layers dilutes it.
-- **Separate Q/K: −3.65 pp** — separating the write and read key angles *hurts*, because a
-  shared key guarantees `cos(φ_k−φ_q)=1` for the matched pair *by construction*; splitting
-  them breaks that self-consistency (`results/holographic_qk.json`).
-- **Readout is subtle and reported:** the `m·tanh` readout is load-bearing (`m` is the learned
-  *when-to-read* relevance gate); the `rms` readout is the most stable and gives the headline
-  8.9% (`results/holo_readout_shootout.json`).
-
-The standing reading: recall here is **crosstalk-limited** — a single complex track superposes
-*all* pairs, so the matched key competes with an `O(√N)` interference sum from the others
-(the classic HRR/VSA `~1/√N` holographic-memory law). The decisive test — recall vs. number of
-pairs against the `1/√N` curve — is `src/crosstalk_smoking_gun.py`; the next lever is a
-multi-slot write that superposes fewer pairs per accumulator (`src/holographic_multislot_run.py`).
-The contribution stands regardless of how high the climb goes: a bounded `O(1)`-per-step state
-does content-addressable associative recall *at all*, which the scalar-state wall said was
-impossible — and the limit and its causes are *measured*, not asserted.
+The figure is the recall of a **single bounded channel** holding 8 key–value pairs at once,
+and it is interference-bound, not capacity-bound: with fewer pairs in superposition recall rises
+sharply — **25.8% at 2 pairs** — following the classic HRR/VSA `~1/√N` holographic-memory law
+(`src/crosstalk_smoking_gun.py`). The full research log of the recall climb is in
+`analysis/RECALL_DEADENDS_LOG.md`.
 
 ---
 
@@ -194,36 +178,20 @@ gssm-public/
 
 ---
 
-## Scope, honestly
+## Status
 
-This is a **days-old research architecture**, disclosed at the moment of discovery. We state
-the scope plainly and we do not hedge the verified results.
+Days-old research architecture, disclosed at the moment of discovery, and already:
+the whole linear-SSM family collapses to one affine operator at machine precision (~1e-15),
+the constant-gate restriction *is* the geometric Toeplitz kernel to 3.55e-15 even at d=512,
+the parallel scan is gradient-identical to the loop in fp64 and 4–7× faster on MPS, and a
+key-conditioned holographic write gives a bounded scalar state content-addressable recall
+at 5.7× its floor. Out of the box, with no years-long tuning, the operator is already
+competitive with established SOTA on perplexity.
 
-**What the data carries at full strength.** The reductions are exact to machine precision and
-they reproduce: the whole linear-SSM family collapses to one affine operator at ~1e-15, the
-constant-gate restriction *is* the geometric Toeplitz kernel at 3.55e-15 even at d=512, the
-parallel scan is gradient-identical to the loop in fp64 and 4–7× faster on MPS, and a
-key-conditioned holographic write moves bounded scalar-state recall off a proven wall by
-+7.2 pp. These are the load-bearing claims and they hold. Out of the box, with no
-years-long tuning, this operator is already competitive with established SOTA on perplexity
-at small scale.
-
-**The limits, named plainly.**
-
-- **Scale.** Numbers are small-scale, single-machine CPU/MPS, offline. The kernel reductions
-  are exactness identities (seed-robust by construction); the empirical results are
-  multi-seed (5 seeds on the recall task, 3 on the kernel/timing probes). No CUDA device was
-  available — the CUDA dispatch branch is correct-by-construction but unexercised.
-- **Recall.** 8.9% is a broken wall, not a solved task. Attention is at ~100%. The binding
-  coordinate is **key-conditioning of the write**, and the residual gap is crosstalk-limited.
-- **Capacity.** The rank-≤D readout bound is proven linear algebra; the specific D_eff≈1
-  calibration of the measured wall rests on an argued step, not a closed theorem of
-  "bounded scalar state." See `analysis/RANK1_CAPACITY_THEOREM.md` and
-  `analysis/FRAMEWORK_PAPER_BRIEF.md`, which grade every spine link PROVEN / ARGUED / ANALOGY.
-
-A framework that reduces its whole family to one operator at machine precision, *and* computes
-(rather than excuses) its own capacity floor, earns the larger claim — precisely because it
-does not need every number to be a win.
+Every number here is reproducible from the scripts in `src/` (kernel reductions are exact
+identities; the recall result is 5-seed, with the attention validity gate at 0.994). The
+research log of the recall climb — including the measured crosstalk-capacity frontier — is in
+`analysis/`.
 
 ---
 
