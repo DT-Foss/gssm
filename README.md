@@ -109,8 +109,7 @@ complex analogue of attention's KV binding, in `O(1)`-per-step state with no KV-
 The figure is the recall of a **single bounded channel** holding 8 key–value pairs at once,
 and it is interference-bound, not capacity-bound: with fewer pairs in superposition recall rises
 sharply — **25.8% at 2 pairs** — following the classic HRR/VSA `~1/√N` holographic-memory law
-(`src/crosstalk_smoking_gun.py`). The full research log of the recall climb is in
-`analysis/RECALL_DEADENDS_LOG.md`.
+(`src/crosstalk_smoking_gun.py`). Full research log of the recall investigation (every experiment, measured effect, and what it taught us) — ongoing — in [analysis/RESEARCH_LOG.md](analysis/RESEARCH_LOG.md).
 
 ---
 
