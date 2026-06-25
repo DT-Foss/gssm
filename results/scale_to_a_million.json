@@ -1,0 +1,45 @@
+{
+  "d_model": 128,
+  "train_T": 32,
+  "seed": 42,
+  "chunk": 8192,
+  "overlap": 128,
+  "base_ppl": 254.96,
+  "curve": {
+    "8192": {
+      "ppl": 254.96,
+      "ratio": 1.0,
+      "n_scored": 1208,
+      "sec": 0.1,
+      "peak_rss_gb": 1.9
+    },
+    "131072": {
+      "ppl": 228.49,
+      "ratio": 0.896,
+      "n_scored": 19549,
+      "sec": 1.9,
+      "peak_rss_gb": 1.93
+    },
+    "1048576": {
+      "ppl": 225.85,
+      "ratio": 0.886,
+      "n_scored": 157210,
+      "sec": 15.4,
+      "peak_rss_gb": 2.09
+    },
+    "4194304": {
+      "ppl": 210.32,
+      "ratio": 0.825,
+      "n_scored": 629213,
+      "sec": 62.5,
+      "peak_rss_gb": 2.13
+    },
+    "16777216": {
+      "ppl": 204.79,
+      "ratio": 0.803,
+      "n_scored": 2515537,
+      "sec": 255.5,
+      "peak_rss_gb": 2.48
+    }
+  }
+}
