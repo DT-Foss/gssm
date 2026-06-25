@@ -32,7 +32,7 @@ see [PAPERS.md](PAPERS.md).
 
 ---
 
-## The three verified contributions
+## The four verified contributions
 
 Each line is the headline measured number and the script that reproduces it. All runs:
 PyTorch 2.9.1, offline, Apple Mac (M-series) CPU/MPS.

@@ -1,0 +1,97 @@
+{
+  "config": {
+    "steps": 400,
+    "n_pairs": 8,
+    "train_len": 64,
+    "test_len": 256,
+    "d_model": 128,
+    "n_layers": 2,
+    "n_heads": 4,
+    "d_head": 32,
+    "lr": 0.003,
+    "seeds": [
+      42
+    ],
+    "chance": 0.015625,
+    "device": "cpu",
+    "arms": [
+      "holo_matched",
+      "delta",
+      "delta_gated",
+      "attn"
+    ]
+  },
+  "summary": {
+    "holo_matched": {
+      "train_mean": 0.0151,
+      "train_std": 0.0,
+      "test_mean": 0.0176,
+      "test_std": 0.0,
+      "per_seed_train": [
+        0.0151
+      ],
+      "per_seed_test": [
+        0.0176
+      ]
+    },
+    "delta": {
+      "train_mean": 0.0151,
+      "train_std": 0.0,
+      "test_mean": 0.0161,
+      "test_std": 0.0,
+      "per_seed_train": [
+        0.0151
+      ],
+      "per_seed_test": [
+        0.0161
+      ]
+    },
+    "delta_gated": {
+      "train_mean": 0.0156,
+      "train_std": 0.0,
+      "test_mean": 0.0181,
+      "test_std": 0.0,
+      "per_seed_train": [
+        0.0156
+      ],
+      "per_seed_test": [
+        0.0181
+      ]
+    },
+    "attn": {
+      "train_mean": 0.9995,
+      "train_std": 0.0,
+      "test_mean": 1.0,
+      "test_std": 0.0,
+      "per_seed_train": [
+        0.9995
+      ],
+      "per_seed_test": [
+        1.0
+      ]
+    }
+  },
+  "verdict": {
+    "validity_gate_attn": 0.9995,
+    "validity_passed": true,
+    "holo_matched_mean": 0.0151,
+    "baseline_alive": false,
+    "best_delta_arm": "delta_gated",
+    "best_delta_mean": 0.0156,
+    "best_delta_std": 0.0,
+    "delta_gain_pp": 0.05,
+    "sigma_bar_pp": 0.0,
+    "beats_holo_by_1sigma": true,
+    "chance": 0.0156,
+    "run_valid": false,
+    "interpretation": "VOID \u2014 holo baseline dead (0.0151 \u2264 0.0469); re-check HolographicLM arm"
+  },
+  "bounded_state": {
+    "description": "M is (n_heads, d_k, d_v) per sample \u2014 fixed, O(1) in T and vocab",
+    "state_reals_per_sample": 4096,
+    "n_heads": 4,
+    "d_k": 32,
+    "d_v": 32
+  },
+  "elapsed_s": 154.6
+}
