@@ -1,0 +1,55 @@
+{
+  "train_gap": 128,
+  "iters": 4000,
+  "gaps": {
+    "0": {
+      "carried": 1.0,
+      "zeroed_at_gap": 0.52,
+      "no_plant": 0.52
+    },
+    "8": {
+      "carried": 1.0,
+      "zeroed_at_gap": 0.498,
+      "no_plant": 0.498
+    },
+    "16": {
+      "carried": 1.0,
+      "zeroed_at_gap": 0.49,
+      "no_plant": 0.49
+    },
+    "32": {
+      "carried": 1.0,
+      "zeroed_at_gap": 0.527,
+      "no_plant": 0.527
+    },
+    "64": {
+      "carried": 1.0,
+      "zeroed_at_gap": 0.463,
+      "no_plant": 0.463
+    },
+    "128": {
+      "carried": 1.0,
+      "zeroed_at_gap": 0.47,
+      "no_plant": 0.47
+    },
+    "256": {
+      "carried": 1.0,
+      "zeroed_at_gap": 0.505,
+      "no_plant": 0.505
+    }
+  },
+  "horizon_G_star": 256,
+  "beacon_gamma_heads": [
+    0.6238,
+    0.5774,
+    0.5785,
+    0.6295,
+    0.5048,
+    0.3949,
+    0.4018,
+    0.2162
+  ],
+  "beacon_tau_max": 2.7,
+  "decisive_gap": 64,
+  "decisive_separation": 0.537
+}

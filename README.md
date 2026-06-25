@@ -220,6 +220,36 @@ raw run log is committed verbatim.
 → `src/scale_to_a_billion.py`, `src/plot_billion.py`, `src/verify_billion.py`,
 `results/scale_to_a_billion.json`, `results/scale_to_a_billion.run.log`
 
+**Living-stream: constant-memory TRAINING + a state that lives through silence.** The billion-token
+result is *eval*. The same persistent state also makes *training* O(1), and lets the model remember
+across a pause in the input — two things a turn-based, KV-cache model structurally cannot do.
+
+![Living-stream: constant-memory training and a bit carried through an input gap](plots/living_stream.png)
+
+- **(A) Constant-memory streaming training.** Train from scratch on streamed C4, carrying the
+  per-layer state `Z` across chunks and cutting the graph with `.detach()` (truncated BPTT). Held-out
+  loss (WT-2 val, never streamed) falls **8.69 → 5.22** over 3M streamed tokens at **flat RSS ~0.8 GB**.
+  The truncation is *exact*, not approximate: grad-cosine vs full-window BPTT = **1.0000** (the ~5-8-token
+  receptive field throws away no gradient). Control: keep the state attached and the autograd graph
+  grows every step — RSS climbs **0.77 → 1.81 GB** over 56k tokens. The `.detach()` carry is exactly
+  what makes training O(1).
+- **(D) Idle-persistence.** A 1-bit beacon task — `[beacon][G filler tokens, no beacon][probe]` —
+  trained with a gap curriculum. The bit is recalled **perfectly through a 256-token input gap**; the
+  decisive control, **zeroing the carried state at the gap**, collapses recall to chance. So the answer
+  rode the persistent state across the silence, not local context.
+- **(E) The mechanism.** Mean-γ suggested only short memory (τ≈2) — a measurement artifact that averaged
+  over the channel axis. The *carrier* channel (the one whose state correlates with the bit, corr −1.00)
+  runs at **γ = 0.9999 (τ≈1000)** with its input gate **shut in the gap (α≈0.005)** and **open at the
+  beacon (α≈0.52)**: a learned bit-vault that writes once and freezes. The class-separation margin holds
+  **96.7 %** across 256 tokens. Layer 0 stays local; Layer 1 grew the long-memory register — a learned
+  division of labour.
+
+One bit is deliberately inside the bounded-scalar regime (multi-key recall is capped ~13% and is not
+claimed). Honest scope and the named next attacks (adversarial non-ignorable fillers, source hot-swap)
+are in [analysis/LIVING_STREAM_THESIS.md](analysis/LIVING_STREAM_THESIS.md).
+→ `src/streaming_train.py` (`--train` / `--idle` / `--carrier` / `--check`), `src/plot_living_stream.py`,
+`results/streaming_train.json`, `results/idle_persistence.json`, `results/carrier_probe.json`
+
 **Seed-robustness (n=5).** The whole ablation is deterministic across seeds. Over 5 seeds
 {1,7,42,123,2024} at 256× (T=8192): Selective-NoPE = **×0.93 ± 0.00** (std rounds to zero — every
 seed lands on the same flat line), while Selective+PE = **×7.05 ± 2.34** (breaks on every seed). The
