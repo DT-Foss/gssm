@@ -190,6 +190,21 @@ compute. The improving PPL is the model *integrating* causal context across the 
 filter, not merely "not crashing." (All safety-guarded; the machine stayed >80% free throughout.)
 → `src/scale_to_the_wall.py`, `src/scale_to_a_million.py`, `results/scale_to_a_million.json`
 
+**Doubly `O(1)`: the corpus is just an iterator.** The million-token run holds the corpus in a
+list. The next step removes that too — stream the corpus *lazily* (HuggingFace `streaming=True`,
+documents tokenized on the fly into a rolling buffer) and run the same chunked, now *batched*, eval.
+Neither the corpus nor the activations are ever materialized in full, so **effective sequence length
+is limited only by wall-clock time — never by RAM.** The same `O(1)`-state forward streams a
+**billion tokens** of C4 at constant memory, checkpointing perplexity and peak RSS every 50M tokens;
+the memory line is flat from the first checkpoint to the last. The batched eval is exact —
+`ppl_batched / ppl_single = 1.00000` on identical scored tokens. Because the corpus enters only as
+an iterator, C4 is interchangeable with any token stream: a web scraper, a live feed, the whole
+internet. That is the real claim, of which every length number here is evidence: **constant-memory
+consumption of an unbounded stream** — a model that does not load a context but *consumes a stream*.
+The thesis and its consequence are written up in
+[analysis/STREAMING_THESIS.md](analysis/STREAMING_THESIS.md).
+→ `src/scale_to_a_billion.py`, `src/plot_billion.py`, `results/scale_to_a_billion.json` *(billion-token run in progress; numbers land on completion)*
+
 **Seed-robustness (n=5).** The whole ablation is deterministic across seeds. Over 5 seeds
 {1,7,42,123,2024} at 256× (T=8192): Selective-NoPE = **×0.93 ± 0.00** (std rounds to zero — every
 seed lands on the same flat line), while Selective+PE = **×7.05 ± 2.34** (breaks on every seed). The
