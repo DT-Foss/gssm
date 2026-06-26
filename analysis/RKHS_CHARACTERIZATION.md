@@ -173,7 +173,7 @@ true; the Selective architecture deliberately leaves it.
 
 ---
 
-## 3. Positive semi-definiteness: the honest statement
+## 3. Positive semi-definiteness: the precise statement
 
 There are three distinct Gram matrices one can write, and they have **three different**
 PSD statuses. Conflating them is exactly the error of the overclaiming version.
@@ -302,7 +302,7 @@ Readings:
 
 ---
 
-## 6. The lead claim, and where the RKHS view is weaker than the hype
+## 6. The lead claim, and the precise boundary of the RKHS view
 
 ### 6.1 The one falsifiable claim to lead with
 
@@ -324,10 +324,10 @@ wrong. *(Predicted: it matches — `constant_gamma_closed_form` already reproduc
 sequential scan to 5e-17 in float64 (4.77e-7 in float32, FP-summation noise); the open
 claim is that the **learned** constant-gate optimum is the kernel solution.)*
 
-### 6.2 Honest list — where the RKHS view is weaker than the overclaiming version
+### 6.2 Where the precise claim differs from a fixed-Mercer reading
 
-1. **Not a fixed Mercer kernel.** The headline weakness, and the prior chat's exact
-   error: because `γ, α, gate` all depend on `x`, there is **no single kernel `k(v,v')`
+1. **Not a fixed Mercer kernel.** The load-bearing boundary: because `γ, α, gate` all
+   depend on `x`, there is **no single kernel `k(v,v')`
    in raw velocity space across inputs.** "Replace BPTT with ridge regression on a fixed
    Mercer kernel" is **false** for the selective model. Ridge/closed-form solves apply
    only in the **constant-gate (LTI) special case** — which is exactly the case the
@@ -358,7 +358,9 @@ claim is that the **learned** constant-gate optimum is the kernel solution.)*
    FINAL_REPORT's 14% MQAR limit: a scalar (`d=1` per channel) reproducing readout cannot
    implement KV-binding. The RKHS view explains *why* — a rank-controlled scalar
    functional has bounded representational capacity for pair lookups — but it does **not**
-   rescue recall. This is a genuine capacity limit, not a presentation artifact.
+   rescue recall. This is a capacity limit: a rank-controlled scalar functional has bounded
+   pair-lookup capacity. One attention layer (rank K) fixes it; the standalone scalar limit
+   is structural.
 
 ### 6.3 Why the correct claim is *stronger* than the hype
 

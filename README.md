@@ -354,16 +354,17 @@ gssm-public/
 │   ├── parallel_scan.py, parallel_scan_integration.py, scan_dispatch.py   the scan (C2)
 │   ├── holographic_gssm.py + holographic_*_run.py   key-conditioned recall (C3)
 │   └── phase_gssm.py, mqar.py, ...
-├── analysis/                theory + briefs (7 docs)
+├── analysis/                theory + measured logs (11 docs)
 │   ├── RKHS_CHARACTERIZATION.md, RKHS_UNIFICATION_SECTION.md
 │   ├── KERNEL_UNIFICATION_SPINE.md, RANK1_CAPACITY_THEOREM.md
-│   ├── FRAMEWORK_PAPER_BRIEF.md, FORWARD_OFFENSIVE_REPORT.md
+│   ├── LENGTH_INVARIANCE_THEORY.md, STREAMING_THESIS.md, LIVING_STREAM_THESIS.md
+│   ├── RECALL_DEADENDS_LOG.md, RESEARCH_LOG.md, Z3_COMBINE_VERDICT.md
 │   └── SCAN_DEPLOYMENT_NOTES.md
 ├── results/                 measured JSON + logs (17 files) — the evidence
 └── plots/                   figures (15 PNGs)
 ```
 
-`reference/` = architecture · `src/` = experiments · `analysis/` = theory + briefs
+`reference/` = architecture · `src/` = experiments · `analysis/` = theory + measured logs
 · `results/` = measured JSON · `plots/` = figures.
 
 ---
