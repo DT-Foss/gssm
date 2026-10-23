@@ -2,7 +2,7 @@
 
 **A reproducing-kernel framework for the linear-SSM family.**
 
-**Author:** David Tom Foss · **Year:** 2026 · **License:** Apache-2.0
+**Author:** David Tom Foss · **Year:** 2026 · **License:** PolyForm Noncommercial 1.0.0
 
 > This README is a **timestamped public disclosure** (prior art). Every claim below
 > is a number we measured, with the exact script that reproduces it. The dates,
@@ -391,7 +391,7 @@ research log of the recall climb — including the measured crosstalk-capacity f
 
 ## License
 
-Apache License 2.0. See `LICENSE`.
+PolyForm Noncommercial License 1.0.0. See [LICENSE](LICENSE). Commercial licenses: Wirkung Inc. (d.foss@ieee.org).
 
 ## Citation
 
